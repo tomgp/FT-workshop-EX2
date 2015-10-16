@@ -1,31 +1,56 @@
 'use strict';
 require('babelify/polyfill'); //remove this line if you don't care about ES6 pollyfils
+var processData = require('./process-data.js');
 var d3 = require('d3');
 
 d3.csv('data.csv', main);
 
 function main(data){
+	//configuration
+	var width = 1000,
+		height = 1000,
+		margin = {
+			top:20,
+			left:20,
+			bottom:20,
+			right:20
+		},
+		maxWidth = 100,
+		maxHeight = 100;
+
 	var processed = data.map( processData );
+
 	var filtered = processed.filter( function(d){
 		return (d.date.getFullYear() == 2001);
 	} );
 
-	console.log('data ', data );
-	console.log('processed ', processed );
+	var dimensions = Math.ceil( Math.sqrt(filtered.length) );
+
+	var svg = d3.select('#chart')
+		.append('svg')
+			.attr({
+				width: width,
+				height: height
+			})
+		.append('g')
+			.attr({
+				'transform':'translate(' + margin.left + ',' + margin.top + ')'
+			});
+
+	svg.selectAll('.mark')
+		.data(filtered)
+			.enter()
+		.append('g')
+			.attr({ 
+				transform: function(d, i){
+					return 'translate(' + Math.floor(i/dimensions) + ',' + (i%dimensions) + ')';
+				}
+			})
+		.append('rect')
+			.attr({
+				'width': maxHeight-10,
+				'height': maxHeight-10
+			})
+
 	console.log('filtered', filtered );
-}
-
-
-
-function processData(d){
-	var dateFormat = d3.time.format('%Y-%m-%d');
-	var total = Number( d.yes ) + Number( d.no );
-	return {
-		date: dateFormat.parse( d.date ),
-		yes: Number( d.yes ),
-		no: Number( d.no ),
-		total: total,
-		yesPct: 100/ total * Number( d.yes ),
-		noPct: 100/ total * Number( d.no )
-	};
 }
