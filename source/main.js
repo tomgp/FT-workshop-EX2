@@ -42,15 +42,19 @@ function main(data){
 			.enter()
 		.append('g')
 			.attr({ 
-				transform: function(d, i){
-					return 'translate(' + Math.floor(i/dimensions) + ',' + (i%dimensions) + ')';
+				'class': 'mark',
+				'transform': function(d, i){
+					var xPos = Math.floor(i/dimensions) * maxWidth,
+						yPos = (i%dimensions) * maxHeight;
+
+					return 'translate(' + xPos + ',' + yPos + ')';
 				}
 			})
 		.append('rect')
 			.attr({
 				'width': maxHeight-10,
 				'height': maxHeight-10
-			})
+			});
 
-	console.log('filtered', filtered );
+	console.log('filtered' , filtered);
 }
