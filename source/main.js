@@ -20,6 +20,8 @@ function main(data){
 
 	var processed = data.map( processData );
 
+	console.log( 'processed', processed );
+
 	var filtered = processed.filter( function(d){
 		return (d.date.getFullYear() == 2001);
 	} );
