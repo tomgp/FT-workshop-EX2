@@ -1,4 +1,9 @@
-.mark{
-	fill:#FFF;
+.mark {
+	fill: #FFF;
 	stroke: #000;
+}
+
+.mark text {
+	fill: #000;
+	stroke: none;
 }
