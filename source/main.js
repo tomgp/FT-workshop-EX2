@@ -18,17 +18,22 @@ function main(data){
 		maxWidth = 100,
 		maxHeight = 100;
 
-	var processed = data.map( processData );
+	var processed = data.map( processData.process );
+	var years = unique( data.map( processData.years ) );
 
 	console.log( 'processed', processed );
+	console.log( 'years', years );
 
-	var filtered = processed.filter( function(d){
-		return (d.date.getFullYear() == 2001);
-	} );
+	var year = 2001;
+	var filtered = processed.filter(function(d){
+		return (d.date.getFullYear() == year);
+	});
 
 	var dimensions = Math.ceil( Math.sqrt(filtered.length) );
 
 	var svg = d3.select('#chart')
+		.selectAll('svg')
+			.data(years).enter()
 		.append('svg')
 			.attr({
 				width: width,
@@ -38,6 +43,13 @@ function main(data){
 			.attr({
 				'transform':'translate(' + margin.left + ',' + margin.top + ')'
 			});
+
+	svg.append('text')
+		.attr({
+			'class':'chart-title',
+			'dy':-5
+		})
+		.text(year);
 
 	svg.selectAll('.mark')
 		.data(filtered)
@@ -116,4 +128,14 @@ function numberVis(g, config){
 			y: (config.maxHeight-10)/2
 		})
 		.text(function(d){ return Math.round(d.yesPct) });
+}
+
+function unique(years){
+	var values = years.reduce(function(previousValue, currentValue,i ,a){
+		if (previousValue.indexOf(currentValue) < 0) {
+			return previousValue.concat([currentValue]) 
+		}
+		return previousValue;
+	},[]);
+	return values;
 }
