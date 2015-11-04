@@ -52,30 +52,30 @@ function main(data){
 					return 'translate(' + xPos + ',' + yPos + ')';
 				}
 			})
-		.call(function(g){
+		.call( numberVis );
 
-			g.append('rect')
-				.attr({
-					'width': maxHeight-10,
-					'height': maxHeight-10
-				});
+	function numberVis(g){
+		g.append('rect')
+			.attr({
+				'width': maxHeight-10,
+				'height': maxHeight-10
+			});
 
-			g.append('text')
-				.attr({
-					x: maxWidth-10,
-					y: (maxHeight-10)/2,
-					'text-anchor':'end'
-				})
-				.text(function(d){ return Math.round(d.noPct) });
+		g.append('text')
+			.attr({
+				x: maxWidth-10,
+				y: (maxHeight-10)/2,
+				'text-anchor':'end'
+			})
+			.text(function(d){ return Math.round(d.noPct) });
 
-			g.append('text')
-				.attr({
-					x: 0,
-					y: (maxHeight-10)/2
-				})
-				.text(function(d){ return Math.round(d.yesPct) });
-
-		})
+		g.append('text')
+			.attr({
+				x: 0,
+				y: (maxHeight-10)/2
+			})
+			.text(function(d){ return Math.round(d.yesPct) });
+	}
 
 	console.log('filtered' , filtered);
 }
