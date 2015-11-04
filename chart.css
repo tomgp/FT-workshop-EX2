@@ -1,3 +1,13 @@
+.yes-block{
+	fill: #F5F;
+	stroke:none;
+}
+
+.no-block{
+	fill: #5FF;
+	stroke:none;
+}
+
 .mark {
 	fill: #FFF;
 	stroke: #000;

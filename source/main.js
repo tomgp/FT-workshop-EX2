@@ -52,30 +52,68 @@ function main(data){
 					return 'translate(' + xPos + ',' + yPos + ')';
 				}
 			})
-		.call( numberVis );
+		.call( numberSizeVis, {maxHeight:maxHeight, maxWidth:maxWidth});
 
-	function numberVis(g){
-		g.append('rect')
-			.attr({
-				'width': maxHeight-10,
-				'height': maxHeight-10
-			});
+}
 
-		g.append('text')
-			.attr({
-				x: maxWidth-10,
-				y: (maxHeight-10)/2,
-				'text-anchor':'end'
-			})
-			.text(function(d){ return Math.round(d.noPct) });
 
-		g.append('text')
-			.attr({
-				x: 0,
-				y: (maxHeight-10)/2
-			})
-			.text(function(d){ return Math.round(d.yesPct) });
-	}
+function numberSizeVis(g, config){
+	var blockScale = d3.scale.linear()
+		.range([0, config.maxWidth-10])
+		.domain([0,100])
+	g.append('rect')
+		.attr({
+			'width': function(d){ return blockScale(d.yesPct) },
+			'height': config.maxHeight-10,
+			'class':'yes-block'
+		});
 
-	console.log('filtered' , filtered);
+	g.append('rect')
+		.attr({
+			'x': function(d){ return blockScale(d.yesPct) },
+			'width': function(d){ return blockScale(d.noPct) },
+			'height': config.maxHeight-10,
+			'class':'no-block'
+		});
+
+	g.append('text')
+		.attr({
+			x: function(d){ return blockScale(d.yesPct) },
+			y: (config.maxHeight-10)/2,
+			dx: 5,
+			'text-anchor':'start'
+		})
+		.text(function(d){ return Math.round(d.noPct) });
+
+	g.append('text')
+		.attr({
+			x: function(d){ return blockScale(d.yesPct) },
+			y: (config.maxHeight-10)/2,
+			dx: -5,
+			'text-anchor':'end'
+		})
+		.text(function(d){ return Math.round(d.yesPct) });
+}
+
+function numberVis(g, config){
+	g.append('rect')
+		.attr({
+			'width': config.maxHeight-10,
+			'height': config.maxHeight-10
+		});
+
+	g.append('text')
+		.attr({
+			x: config.maxWidth-10,
+			y: (config.maxHeight-10)/2,
+			'text-anchor':'end'
+		})
+		.text(function(d){ return Math.round(d.noPct) });
+
+	g.append('text')
+		.attr({
+			x: 0,
+			y: (config.maxHeight-10)/2
+		})
+		.text(function(d){ return Math.round(d.yesPct) });
 }
