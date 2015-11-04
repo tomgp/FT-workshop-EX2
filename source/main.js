@@ -7,8 +7,8 @@ d3.csv('data.csv', main);
 
 function main(data){
 	//configuration
-	var width = 1000,
-		height = 1000,
+	var width = 500,
+		height = 500,
 		margin = {
 			top:20,
 			left:20,
@@ -20,16 +20,6 @@ function main(data){
 
 	var processed = data.map( processData.process );
 	var years = unique( data.map( processData.years ) );
-
-	console.log( 'processed', processed );
-	console.log( 'years', years );
-
-	var year = 2001;
-	var filtered = processed.filter(function(d){
-		return (d.date.getFullYear() == year);
-	});
-
-	var dimensions = Math.ceil( Math.sqrt(filtered.length) );
 
 	var svg = d3.select('#chart')
 		.selectAll('svg')
@@ -44,27 +34,34 @@ function main(data){
 				'transform':'translate(' + margin.left + ',' + margin.top + ')'
 			});
 
-	svg.append('text')
-		.attr({
-			'class':'chart-title',
-			'dy':-5
-		})
-		.text(year);
-
-	svg.selectAll('.mark')
-		.data(filtered)
-			.enter()
-		.append('g')
-			.attr({ 
-				'class': 'mark',
-				'transform': function(d, i){
-					var xPos = Math.floor(i/dimensions) * maxWidth,
-						yPos = (i%dimensions) * maxHeight;
-
-					return 'translate(' + xPos + ',' + yPos + ')';
-				}
+	svg.each(function(year){
+		var s = d3.select(this);
+		var filtered = processed.filter(function(d){
+			return (d.date.getFullYear() == year);
+		});
+		var dimensions = Math.ceil( Math.sqrt(filtered.length) );
+		s.append('text')
+			.attr({
+				'class':'chart-title',
+				'dy':-5
 			})
-		.call( numberSizeVis, {maxHeight:maxHeight, maxWidth:maxWidth});
+			.text(year);
+
+		s.selectAll('.mark')
+			.data(filtered)
+				.enter()
+			.append('g')
+				.attr({ 
+					'class': 'mark',
+					'transform': function(d, i){
+						var xPos = Math.floor(i/dimensions) * maxWidth,
+							yPos = (i%dimensions) * maxHeight;
+
+						return 'translate(' + xPos + ',' + yPos + ')';
+					}
+				})
+			.call( numberSizeVis, {maxHeight:maxHeight, maxWidth:maxWidth});
+	});
 
 }
 
