@@ -47,8 +47,13 @@ var processedData = data.map(function(d){
 		yesPct: 100/ total * Number( d.yes ),
 		noPct: 100/ total * Number( d.no )
 	};
-})
+});
+
 ```
+
+The good thing about using `map` rather than a comventional `for` loop is that it's easier to see that the function has no side effects, it takes an input and returns an output but nothing outside the function is changed. This makes it easier to think about the function spearately from the surrounding program. 
+
+It's definately worth familiarising yourself with javascript's built in array functions [here's a page which lists them](https://github.com/mbostock/d3/wiki/Arrays).
 
 branch: 'make-a-module'
 
