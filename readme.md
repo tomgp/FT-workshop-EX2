@@ -23,9 +23,32 @@ This repository has a basic build script set up to do this process for you -- it
 
 Right. You may notice the repository you just cloned has several branches. These are completed steps of the excercise so if you go off track you can get back on track fairly easily by just switching to the appropriate branch. Or if you want you can just skip straight to the branch and mess around with the code to see what happens.
 
-##My first module
+###My first module
+
+We're going to write some code and then turn it into a module.
 
 At the moment the file `source/main.js` has some very simple code in it to load a CSV and creates a date formatter (which matches the format used in th data) using [D3's time formatter](https://github.com/mbostock/d3/wiki/Time-Formatting)
+
+The data in question is a survey I made up where we imagined asking some people for the their opinion on something and then tallied up their imaginary answers , Yes or No, across various dates. Lets try and visualise this as a series of multiple small charts... 
+
+First thing we need to do is sort out the data, the dates need to be proper dates not just strings and it would be useful to have the survey results as percentages. the easiest way to do the same thing to each element of an array is to use [Javascript's map function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map).
+
+how about something like ...
+
+```
+var processedData = data.map(function(d){
+	var dateFormat = d3.time.format('%Y-%m-%d');
+	var total = Number( d.yes ) + Number( d.no );
+	return {
+		date: dateFormat.parse( d.date ),
+		yes: Number( d.yes ),
+		no: Number( d.no ),
+		total: total,
+		yesPct: 100/ total * Number( d.yes ),
+		noPct: 100/ total * Number( d.no )
+	};
+})
+```
 
 branch: 'make-a-module'
 
