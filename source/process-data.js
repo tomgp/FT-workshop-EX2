@@ -1,3 +1,5 @@
+var d3 = require('d3');
+
 module.exports = function (d){
 		var dateFormat = d3.time.format('%Y-%m-%d');
 		var total = Number( d.yes ) + Number( d.no );
