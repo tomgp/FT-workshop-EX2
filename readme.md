@@ -51,23 +51,140 @@ var processedData = data.map(function(d){
 
 ```
 
+####BRANCH : process-data
+
 The good thing about using `map` rather than a comventional `for` loop is that it's easier to see that the function has no side effects, it takes an input and returns an output but nothing outside the function is changed. This makes it easier to think about the function spearately from the surrounding program. 
 
 It's definately worth familiarising yourself with javascript's built in array functions [here's a page which lists them](https://github.com/mbostock/d3/wiki/Arrays).
 
-branch: 'make-a-module'
+So that's our code for processing the data -- in real world examples you may be doing somethign more complex but for our purposes this is fine.
 
-branch: 'draw-some-stuff'
+Because the thing that does the data processing is a function with (we hope) no side effects we can easily take it out from its current place. 
+
+Lets do it in stages so that we can see what's happening
+
+First lets turn the anonymous function used in the map into a named function
+
+```
+var processedData = data.map(processElement);
+
+function processElement(d){
+	...
+}
+```
+
+So now we have a function called process element let's put that in a new file. Make a new file in the same directory as _main.js_ called something sensible like _data-processing.js_ cut the `processElement` function from _main.js_ and paste it in there. 
+
+At this point your browser console will (I hope) give an error as ```processElement``` is no longer defined as far as _main.js_ is concerned.
+
+There are a couple of things we need to do to fix this state of affairs.
+
+We need to make _data-processing.js_ make  the `processElement` function available to the outside world. THis is done as follows:
+
+```
+function processElement(d){
+	...
+}
+
+module.exports = processElement;
+```
+
+Then in _main.js_ we need to specify that this file is a dependency
+
+```
+var processElement = require('./data-processing.js');
+```
+
+But wait! We're getting a different error now. This is because the function we made isn't as nicely isolated from the world outside as I tried to make you think it was. Because of the date processing D3 is a dependency of _data-processing.js_. There are a couple of ways to fix this the easiest being simply to require D3 inside _data-processing.js_. 
+
+```
+var d3 = require('d3')
+```
+
+Otherwise we could a) inline or rewrite the bit of code we are using from d3 might be worth it if we expect this may be used in a d3-less context or b) use a technique called dependency injection where we give the modules user a mechanism by which they can pass a date parser of their own creation into the function (that's a bit beyond what I'm hoping to explain here though)
+
+####BRANCH : make-a-module
+
+OK, now lets skip some basic drawing stuff so switch to
+
+####BRANCH : draw-some-stuff
+
+and we'll go from there.
 
 ###Using 'call'
 
-1 branch: 'using-call'
-use 'call' to neatly add more than one node to a parrent 
-	
-2 branch: 'extract-call-function'
-abstract the resulting function 
+If you want to add multiple nodes to a particular parent e.g. a _text_ label and a _rect_ angle to a _g_roup you might typically store the selection chain at a particular point to a variable and then continue adding stuff to that variable, something like this:
 
-###Using 'each'
+```
+var parent = d3.select('svg').selectAll('g').data(data)
+	.enter()
+		.append('g')
 
-1 branch:'using-each'
+parent.append('text')
+	...
+
+parent.append('rect')
+	...
+
+```
+
+this is nice andeasy and perfectly fine for simple situations but it deosn't allow for easy code reuse; say the visualisation you're adding to the group needs to be repeated in otehr contexts, you might be able to encapulate it as a function -- something that took the parent selection as an argument and returns the current selection.
+
+the function might look something like this
+
+```
+
+function( parent ){
+	parent.append('text')
+		...
+
+	parent.append('rect')
+		...
+}
+
+```
+
+luckily D3's selection has a method ```call``` which allows you to do exactly this
+
+i.e.
+
+```
+d3.select('svg').selectAll('g').data(data)
+	.enter()
+		.append('g')
+	.call(function( parent ){
+		parent.append('text')
+			...
+
+		parent.append('rect')
+			...
+	});
+```
+
+
+#### branch: 'using-call'
+
+Personally, in-spite of it's other advantages, I think this code is less readable than the simple approach we took first time around but we can make it much better by extracting the currently anonymous _call_ed function. Like this:
+
+```
+d3.select('svg').selectAll('g').data(data)
+	.enter()
+		.append('g')
+	.call(drawVisualisation);
+
+function drawVisualisation( parent ){
+	parent.append('text')
+		...
+
+	parent.append('rect')
+		...
+}
+```
+
+doing this lets us consider the function as a 'black box'; we know what inputs it takes and what outputs it gives back so the actual process of visualisation can be thought about separately. We might decide later in the project that that we want to use two labels and a circle or anything else, it's fine.
+
+#### branch: 'extract-call-function'
+
+#### branch:'using-each'
 use each to render different cuts of the same data on the page 
+
